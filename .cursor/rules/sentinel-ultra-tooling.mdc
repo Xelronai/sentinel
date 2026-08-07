@@ -1,0 +1,31 @@
+---
+description: Sentinel Ultra local tooling pipeline (incoming → ready zip)
+alwaysApply: true
+---
+
+# Sentinel Ultra — Local Tooling
+
+Repo root tooling prepares Harbor packages for upload. Prefer commands over reinventing checks.
+
+## Folders
+
+- `incoming/` — drop downloaded task zips
+- `tasks/<name>/` — working Harbor task
+- `Task_Ready_To_Submit/` — flat upload zips only
+
+## Preferred command
+
+```bash
+python scripts/prepare_task.py incoming/<task>.zip --force
+```
+
+Or for an extracted task: `python scripts/prepare_task.py tasks/<name>`
+
+## Agent rules
+
+1. Run `python scripts/sentinel_doctor.py` at session start if tooling may be broken.
+2. Never claim submit-ready without prepare/check command output.
+3. Auto-fixes never touch tracked source under `environment/repo/`.
+4. Instruction/test/oracle rewrites still follow Ultra submitter rules; tooling only gates hygiene + packaging.
+5. Do not put `runs/` or AI scaffolding in submission zips.
+6. Before zip: fix instruction over-prescription (platform `cdg_sentinel_ultra.prescriptiveness` fails CodeBuild). Follow `sentinel-ultra-zip-ready.mdc`.

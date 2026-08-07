@@ -1,0 +1,3 @@
+# Sentinel Ultra tooling uses the Python standard library only (3.11+).
+# Optional: pytest for future repo_tests
+# pytest>=8.0

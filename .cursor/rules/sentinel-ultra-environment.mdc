@@ -1,0 +1,47 @@
+---
+description: Sentinel Ultra environment Dockerfile allow-list and git hygiene
+alwaysApply: true
+---
+
+# Sentinel Ultra — Environment & Git
+
+## Never
+
+Edit tracked source files under `environment/repo/`. That breaks PR grounding.
+
+## Fixable Dockerfile / env issues
+
+- Alpine missing bash → `apk add --no-cache bash`
+- Missing `frozen-requirements.txt` when Dockerfile COPYs it → generate
+- Missing `tmux` / `asciinema` → install
+- `FROM ...:latest` → pin concrete tag
+- Low cpus/memory/storage → bump within task.toml limits
+- Bad shebang, CRLF, non-executable scripts → normalize
+- Stray root artifacts (`metadata.json`, wrong language labels) → clean
+
+## Not Fixable env
+
+- Tangled apt/pip/npm/cargo toolchain conflicts
+- External multi-GB / live service deps at build or solve (vendoring one small file can be fixable)
+- Oracle timeout may try bump; otherwise may be Not Fixable
+
+## Git hygiene (usually Fixable)
+
+Do work inside `environment/repo`, then re-zip. HEAD wins over mismatched `base_commit_sha` — realign toml to HEAD.
+
+Must be clean before upload:
+
+```bash
+git rev-parse --verify HEAD          # resolves
+git rev-parse HEAD                   # == base_commit_sha
+git rev-list --all --not HEAD        # empty (no leaked fix history)
+git remote                           # empty
+git config --local --get-regexp '^filter\.'   # empty
+git status --porcelain               # empty
+# no .git/logs; .git < 100 MB
+git apply --check ../../tests/tests.patch
+```
+
+## Runtime network
+
+Build may use network. Agent: allowlist gateway only. Verifier: airgapped (`no-network`).

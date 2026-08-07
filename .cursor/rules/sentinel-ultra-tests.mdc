@@ -1,0 +1,37 @@
+---
+description: Sentinel Ultra test quality — coverage, faithfulness, anti-patterns
+alwaysApply: true
+---
+
+# Sentinel Ultra — Test Quality
+
+## Instruction ↔ test alignment (both directions)
+
+- **Coverage:** Every instruction requirement has a real enforcing assertion. Broken/stub solution must fail ≥1 test.
+- **Faithfulness:** Every assertion maps to something stated or reasonably implied. No hidden requirements.
+
+## Requirements
+
+- ≥10 fail-to-pass tests (ideally 10–20)
+- Include regression that fails pre-fix and passes post-fix
+- Outcome-based (run code, check behavior) — not source keyword scans
+- Deterministic: fixed seeds, no flaky clock/network/order dependence
+- Flexible enough for multiple valid implementations when instruction allows
+- No arbitrary names/paths/formats not derivable from instruction
+
+## Auto-fail patterns (never ship)
+
+1. **Silent skip** — `@pytest.mark.skip` / skipif / ImportError→None so tests don't run
+2. **No CLI invoke** — instruction requires CLI/service but tests only hit library internals
+3. **Pre-created artifact** — `path.exists()` without content/behavior checks
+4. **Agent controls coverage** — iterate agent output to decide what to test
+5. **Fail-open** — missing file returns / broad except pass
+6. **Overreach** — assert names/formats/thresholds instruction never stated
+
+## Don't
+
+- Assert on source text (`"deque" in source`)
+- Embed verifier-only constants agent can't derive
+- Compare to hidden golden files instruction never foreshadows
+- Require exact error strings / key order / whitespace unless instruction fixes them
+- Edit existing pass-to-pass files — add new tests via `tests.patch` only

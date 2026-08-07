@@ -1,0 +1,73 @@
+---
+description: Workspace agent workflow for Sentinel Ultra task assist and review_answer
+alwaysApply: true
+---
+
+# Sentinel Ultra — Workspace Agent Workflow
+
+When the user says **review**, **start task**, **fix task**, or opens a new Ultra package:
+
+## STEP 1 — Auto-read the task
+
+1. Find the Harbor package in the workspace (or `Sentinel/` / download folder). Ignore `.cursor/`, rule files, `sentinel_ultra.md`, `review_answer.txt`.
+2. Read: `instruction.md`, `task.toml`, `environment/Dockerfile`, `environment/problem_statement.md`, `solution/solve.sh`, `solution/golden.patch` (or `solution.patch`), `tests/test.sh`, `tests/tests.patch`, `tests/config.json`, any `tests/files/`.
+3. Skim `environment/repo/` as needed. **Never propose editing tracked repo source** unless user explicitly overrides (against Ultra rules).
+4. Read aggregate `runs/**/result.json` if present; sample failing/passing trial logs.
+5. Fetch `source` URL from `task.toml` and cross-check PR/commit/issue scope.
+6. Confirm `problem_statement.md` == `instruction.md`.
+7. Count `fail_to_pass` in `config.json` (need ≥10).
+
+## STEP 1.5 — Independent assessment (before submitter paste)
+
+Apply Ultra principles and produce a working verdict: **Valid as-is / Fixable / Not Fixable**.
+
+Check: instruction quality & leakage; PR alignment & scope; Dockerfile & allowed env issues; git hygiene signals; oracle vs instruction; test coverage & faithfulness (no unrequested checks); runs/timeouts; task.toml resources/network_mode; authenticity (~100+ LOC / multi-file).
+
+## STEP 2 — Ask for submitter data
+
+```
+Original Directory Name:
+Category / difficulty_explanation (if shown):
+Languages (platform):
+Open-source License (if asked):
+
+SUBMITTER VERDICT: Valid as-is | Fixable | Not Fixable
+
+SUBMITTER'S ANSWERS:
+(paste form answers, issue lists, Files Changed, Comments for Reviewer)
+```
+
+## STEP 3 — If Fixable or Not Fixable, get issue details
+
+Ask for numbered issues (category, description, fixable?, how to fix) and whether all issues are resolvable. Do **not** invent the submitter's issue list.
+
+## STEP 4 — Compare and write `review_answer.txt`
+
+Independently verify; Accept / Needs Revision / Reject per Ultra reviewer rules.
+
+### review_answer.txt shape
+
+```
+Reviewer Feedback
+
+As a reviewer, do you believe the task is Valid as-is, Fixable, or Not Fixable?
+[Valid as-is / Fixable / Not Fixable]
+
+Do you Accept, Needs Revision, or Reject the submission?
+[Accept / Needs Revision / Reject]
+
+Accept/Reject Notes:
+[1 short paragraph — 8th-grade English; no emdashes; minimize commas/colons/semicolons;
+cite files/tests/patches verified; agree or disagree with submitter; final outcomes]
+
+Submission Quality Score: [1-5]
+
+Needs Revision Error Categories (if applicable):
+[list or None]
+```
+
+For Not Fixable submissions, include confirmed issue categories and resolvable Yes/No before the reviewer feedback block.
+
+## Assist mode (Fixable tasks)
+
+When user asks to **fix** a task: propose concrete edits to instruction/tests/oracle/Dockerfile/git only within Ultra allow-lists; keep instruction↔tests↔oracle in lockstep; expand PR scope only when asked and keep anchor; remind to re-copy `problem_statement.md` and re-zip flat.

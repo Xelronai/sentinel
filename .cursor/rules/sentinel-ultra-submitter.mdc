@@ -1,0 +1,56 @@
+---
+description: Sentinel Ultra submitter workflow — fix, zip, evals, form
+alwaysApply: true
+---
+
+# Sentinel Ultra — Submitter Workflow
+
+## Quick start
+
+1. Claim Submission on Experts platform (search "Sentinel").
+2. Download zip; locate Harbor files (root, `task/`, or `seed/`).
+3. Decide **Valid as-is / Fixable / Not Fixable**.
+4. If Fixable: edit instruction, tests, oracle; limited Dockerfile; git hygiene in `repo/`.
+5. Keep `problem_statement.md` identical to `instruction.md`.
+6. Zip **flat contents** of task (no wrapping folder, no `runs/`).
+7. Run platform evals; iterate until pass; Send to reviewer.
+
+Throughput: max **2** tasks in pending revision at once.
+
+## What you may edit
+
+| Area | Allowed |
+|------|---------|
+| Instruction | Rewrite for clarity; remove prescription/leakage; expand scope carefully |
+| Tests | Grow f2p to ≥10; align 1:1 with instruction; outcome-based only |
+| Oracle | Fix mismatch or expand with scope; match canonical PR fix; no drive-by refactors |
+| Dockerfile | Listed fixes only (bash, tmux, asciinema, pin image, frozen-reqs, resources, shebang/CRLF) |
+| Git in `repo/` | Remotes, leaked refs past HEAD, HEAD↔base_commit, reflog, `.git` &lt;100MB, clean tree |
+
+## Zip command
+
+```bash
+cd task
+zip -rX ../<name>.zip . -x '*.DS_Store' '__MACOSX/*'
+```
+
+Avoid GUI compress and `zip -rD` (drops empty `.git/refs/`).
+
+## Before upload (local)
+
+- `docker build` environment (network OK at build; runtime airgapped for verifier)
+- `git apply --check` on `tests.patch` at base commit
+- Git hygiene checklist clean
+- Sweep caches (`.pyc`, `__pycache__`, `.venv`, `.DS_Store`, etc.)
+- **Valid as-is:** run oracle → reward 1.0 and NOP → reward 0.0 (platform skips difficulty re-run)
+
+## Platform evals
+
+Static → Difficulty → Oracle → **Quality Check** (blocking on `test_coverage` + `test_faithfulness`). Aim adjudicated scores **&gt; 3** on both test axes. Six auto-REMOVE patterns: silent skip, no CLI invoke when required, pre-created artifact, agent-controlled coverage, fail-open, overreach.
+
+## Form essentials
+
+- Valid as-is: confirm checklist (≥10 f2p, no leakage, not over-prescriptive, etc.)
+- Fixable: issue categories + numbered details + Files Changed + confirm checklist
+- Not Fixable: PR scope reduction/replace and/or disallowed Environment Issues + clear write-up
+- Always: difficulty explanation, Comments for Reviewer, time estimates

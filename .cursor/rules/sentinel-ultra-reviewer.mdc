@@ -1,0 +1,45 @@
+---
+description: Sentinel Ultra reviewer workflow — Accept / Needs Revision / Reject
+alwaysApply: true
+---
+
+# Sentinel Ultra — Reviewer Workflow
+
+Peer ECs verify submitter work. Reach an **independent** task assessment, then pick a review outcome.
+
+## Review outcomes
+
+| Outcome | When |
+|---------|------|
+| **Accept** | Accurate, complete, well-supported; task meets Ultra bar after any fixes |
+| **Needs Revision** | Authoring errors remain (instruction/tests/oracle/bundle) that submitter can still fix |
+| **Reject** | Only after **maximum revisions** reached and work still inadequate. Not a substitute for Needs Revision |
+
+If platform shows "Maximum Revisions Reached", use Reject (or Accept + adjudicator notes if Reject unavailable).
+
+## By submitter path
+
+**Valid as-is:** Repeat content review; confirm instruction↔tests↔oracle↔PR; metadata sane; no hidden scope drift.
+
+**Fixable:** Confirm rewrites fix reported issues; no new leakage/hidden requirements; PR only expanded not reduced; upload is full flat task bundle; cite `runs/` when relevant.
+
+**Not Fixable:** Confirm issues are real and match Not Fixable categories (PR scope reduce/replace, or disallowed env).
+
+## Reviewer form
+
+- Verdict: Accept / Needs Revision / Reject
+- On Accept: confirm Ultra checklist (coverage, faithfulness, no LLM tone, no leakage, oracle match, not over-prescriptive)
+- On Needs Revision: tag error categories (Instruction Styling/Prescriptiveness, Test↔Instruction Misalignment, Coverage, Hints/Answers, Oracle, PR Scope Violation, Environment, etc.) + concrete revision notes citing guideline sections
+- Acknowledge submitter Comments / rebuttal
+- **Submission Quality Score 1–5** (1–2 → Needs Revision; 3–5 → Accept)
+
+## Local Harbor for reviewers
+
+Not required. Optional if it helps verify a finding. Prefer document/logic review of uploaded artifacts and eval reports.
+
+## Do not
+
+- Use old Accept/Reject-only model without Needs Revision
+- Reject when Needs Revision is still available
+- Ignore Comments for Reviewer
+- Mark Not Fixable for infra/platform flakes (rate limits, blank feedback)

@@ -1,0 +1,39 @@
+---
+description: Sentinel Ultra core — verdicts, principles, PR scope, editing boundaries
+alwaysApply: true
+---
+
+# Sentinel Ultra — Core Rules
+
+Last aligned: July 22, 2026 guidelines (`sentinel_ultra.md`).
+
+This workspace is for **Sentinel Ultra** Harbor tasks. Tasks come from real PRs/commits/issues. ECs **review and fix** tasks — they do not invent net-new tasks from scratch.
+
+## Task verdicts (submitter)
+
+| Verdict | When |
+|---------|------|
+| **Valid as-is** | Instruction, tests, oracle align with each other and the source PR. No edits. |
+| **Fixable** | Issues exist but you can correct them within allowed edits. |
+| **Not Fixable** | Only if PR scope must be reduced/replaced, or environment issues ECs cannot fix. |
+
+Never use old labels: "Invalid with minor/major issues", plain Valid/Invalid alone.
+
+## Four principles (every task)
+
+1. **Solvable** — Competent engineer can solve from instruction alone; no fake APIs/files; no arbitrary guesswork.
+2. **Clarity & No Leakage** — Describe problem/behavior, not implementation. No PR URLs, spoilers, or "where to look" file lists. Document required output schemas (that is not leakage).
+3. **Verifiable** — Outcome-based tests; **≥10 fail-to-pass** (ideally 10–20); regression; deterministic; not gameable.
+4. **Authentic** — Real engineering (~100+ lines, 2+ files); reads like a real ticket/Slack/memo, not templated AI.
+
+## PR scope
+
+- ✅ **May expand** PR scope to raise difficulty (related edge cases / capability on same feature).
+- ❌ **Must not reduce or replace** PR scope. That → **Not Fixable**.
+- Never edit tracked source files under `environment/repo/`. Git hygiene on `.git` is allowed.
+
+## Fixable vs Not Fixable (quick)
+
+**Fixable:** over-prescriptive / LLM instruction; test gaps or unrequested checks; &lt;10 f2p; leakage; oracle mismatch; allowed Dockerfile fixes; git hygiene issues; task too easy if you can expand scope.
+
+**Not Fixable:** must shrink/replace PR; tangled image/dep build failures; external multi-GB/network deps at solve time; unrecoverable git corruption (rare — most git issues are fixable).

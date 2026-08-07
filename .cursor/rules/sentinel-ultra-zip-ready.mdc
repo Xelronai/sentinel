@@ -1,0 +1,49 @@
+---
+description: How to make a Sentinel Ultra submission zip that passes platform CDG checks
+alwaysApply: true
+---
+
+# Sentinel Ultra — Zip Ready Rules
+
+Platform CodeBuild runs Harbor CDG checks on the uploaded zip (example module:
+`scripts.harbor.checks.cdg_sentinel_ultra.prescriptiveness`). A zip can be
+structurally valid and still **FAIL BUILD** on instruction tone.
+
+## Before you zip
+
+1. Rewrite `instruction.md` for **WHAT / observable contract**, not **HOW**.
+2. Copy the same text to `environment/problem_statement.md`.
+3. Run local tooling: `python scripts/prepare_task.py tasks/<name>`
+4. Only upload the file under `Task_Ready_To_Submit/`.
+
+## Prescriptiveness (common CodeBuild fail)
+
+State outcomes, environments, and invariants. Do **not**:
+
+- Prescribe delivery mechanism ("pass via argv", "use the platform command interpreter", "fold into a POSIX-quoted shell string")
+- Name exact runtime API expressions as the required detection (`process.platform === 'win32'`, `os.platform()`, specific method calls) unless that symbol is already a public product API the tests must hit
+- Pre-answer investigative discovery (exact env var names like `MSYSTEM` / `MINGW_PREFIX`) when finding the signal is part of the task
+- Give step-by-step patch recipes, "edit file X function Y", or PR links
+
+**OK:** required behavior, schemas, formats, failure modes, contrast with broken behavior.
+**Not OK:** telling the agent which API, argv shape, or env-var checklist to use when alternatives exist.
+
+After any instruction edit, re-sync `problem_statement.md` and re-run prepare.
+
+## Zip shape (must)
+
+Flat Harbor root only:
+
+```text
+instruction.md
+task.toml
+environment/   (Dockerfile, problem_statement.md, repo/)
+solution/      (solve.sh, golden.patch)
+tests/         (test.sh, tests.patch, config.json)
+```
+
+Never ship: `runs/`, `jobs/`, `metadata.json`, `.cursor/`, `AGENTS.md`, `CLAUDE.md`,
+`skills.md`, `__pycache__`, `environment/repo/.git/logs`.
+
+Use tooling packaging (`package_task` / `prepare_task`), not GUI zip, so the
+archive stays flat and excludes authoring junk.

@@ -1,0 +1,60 @@
+---
+description: Sentinel Ultra Harbor layout, golden.patch, config.json, task.toml limits
+alwaysApply: true
+---
+
+# Sentinel Ultra — Harbor Structure
+
+## Layout
+
+```text
+<task>/
+├── instruction.md
+├── task.toml
+├── environment/
+│   ├── Dockerfile
+│   ├── repo/                 # NEVER edit tracked source files
+│   └── problem_statement.md  # MUST be exact copy of instruction.md
+├── solution/
+│   ├── solve.sh              # applies golden.patch
+│   └── golden.patch          # rename solution.patch → golden.patch if needed
+└── tests/
+    ├── test.sh
+    ├── tests.patch           # fail-to-pass tests live here
+    └── config.json           # execution + fail_to_pass / pass_to_pass ids
+```
+
+`runs/` may sit beside the task for reference. **Do not include `runs/` in upload zips.**
+
+## Naming
+
+- Gold patch file is **`golden.patch`** (not `init_state.patch`).
+- Old reverse-patch model is obsolete: oracle **applies** `golden.patch`, it does not reverse `init_state.patch`.
+
+## `config.json` (required shape)
+
+- `grading.fail_to_pass` — non-empty; **≥10** test ids
+- `grading.pass_to_pass` — regression guard
+- Never modify pre-existing p2p test files; add new f2p via `tests.patch` only
+- `tests.patch` must apply cleanly at `base_commit_sha`
+
+## `task.toml` limits (check every task)
+
+| Field | Constraint |
+|-------|------------|
+| `cpus` | 2 or 4 |
+| `memory_mb` | 2048–16384 |
+| `storage_mb` | 5120–10240 |
+| `gpus` | always 0 |
+| `build_timeout_sec` | max 1800 |
+| `[agent] timeout_sec` | max 7200 (raise if agents time out) |
+| `[verifier] timeout_sec` | max 1800 |
+
+**network_mode (required — do not strip):**
+
+- `[environment]` → `"public"`
+- `[agent]` → `"allowlist"` with `allowed_hosts = ["api.portkey.ai"]`
+- `[verifier]` → `"no-network"`
+- Remove `network_mode = "none"` from `docker_compose.yaml` if present
+
+Also verify: `source`, `category`, `difficulty_explanation`, `schema_version`.
